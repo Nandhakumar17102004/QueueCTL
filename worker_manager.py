@@ -1,8 +1,3 @@
-"""
-Worker management and job execution.
-Handles multiple concurrent workers with graceful shutdown.
-"""
-
 import subprocess
 import time
 import threading
@@ -11,7 +6,6 @@ from .queue_manager import QueueManager
 from utils.logger import QueueLogger
 
 class Worker:
-    """Individual worker thread."""
     
     def __init__(self, worker_id: str, queue_manager: QueueManager, 
                  logger: QueueLogger, config):
@@ -44,12 +38,10 @@ class Worker:
                     self._execute_job(job)
                     self.current_job = None
                 else:
-                    # No jobs available, sleep briefly based on config
                     time.sleep(self.config.get('worker_poll_interval', 1))
         
         except Exception as e:
             self.logger.error(f"Worker {self.worker_id} encountered a critical error: {e}")
-            # CRITICAL FIX: Mark current job as failed if worker crashes
             if self.current_job:
                 self.queue_manager.mark_job_failed(
                     self.current_job['id'], 
@@ -62,7 +54,6 @@ class Worker:
     
     def _execute_job(self, job: Dict[str, Any]):
         """Execute a single job using subprocess with robust timeout handling."""
-        # Check stop signal before starting job
         if self.should_stop:
             self.logger.info(f"Worker {self.worker_id} skipping job due to stop signal")
             return
@@ -74,19 +65,15 @@ class Worker:
         start_time = time.time()
         
         try:
-            # Validate command before execution
             if not command or not command.strip():
                 raise ValueError("Empty command")
             
-            # For sleep commands, use platform-specific approach for better timeout testing
             if command.strip().startswith('sleep'):
-                # Use Python-based sleep for more reliable timeout testing
                 sleep_time = self._extract_sleep_time(command)
                 if sleep_time:
                     self._execute_sleep_job(job_id, sleep_time, timeout)
                     return
             
-            # Use Popen for more control over process termination
             process = subprocess.Popen(
                 command,
                 shell=True,
@@ -98,17 +85,14 @@ class Worker:
             )
             
             try:
-                # Wait for process with timeout
                 stdout, stderr = process.communicate(timeout=timeout)
                 returncode = process.returncode
                 
                 duration = time.time() - start_time
                 
                 if returncode == 0:
-                    # Job succeeded - handle output encoding
                     if stdout:
                         try:
-                            # Clean output to handle encoding issues
                             output = self._clean_output(stdout)[:1000]
                         except Exception as e:
                             output = f"[Output encoding error: {e}]"
@@ -119,7 +103,6 @@ class Worker:
                     self.logger.log_execution(job_id, duration, True, output)
                     self.queue_manager.storage.record_metric('execution_time', duration)
                 else:
-                    # Job failed (non-zero exit code)
                     if stderr:
                         try:
                             error = self._clean_output(stderr)[:500]
@@ -132,14 +115,11 @@ class Worker:
                     self.logger.log_execution(job_id, duration, False, error)
                     
             except subprocess.TimeoutExpired:
-                # Timeout occurred - terminate the process
                 duration = time.time() - start_time
                 self.logger.warning(f"Job {job_id} timeout after {timeout}s, terminating...")
                 
-                # Try to terminate gracefully
                 process.terminate()
                 try:
-                    # Wait a bit for graceful termination
                     process.wait(timeout=2)
                 except subprocess.TimeoutExpired:
                     # Force kill if still running
@@ -151,7 +131,6 @@ class Worker:
                 self.logger.log_execution(job_id, duration, False, error)
             
         except Exception as e:
-            # Catch unexpected system errors (e.g., Command not found)
             duration = time.time() - start_time
             error = str(e)
             should_retry = not isinstance(e, (ValueError, FileNotFoundError))
@@ -161,9 +140,7 @@ class Worker:
     def _clean_output(self, text: str) -> str:
         """Clean output text to handle encoding issues."""
         try:
-            # Try to handle common encoding problems
             cleaned = text.encode('utf-8', errors='replace').decode('utf-8')
-            # Remove or replace problematic characters
             cleaned = cleaned.replace('\u2713', '[check]')  # Replace checkmarks
             cleaned = cleaned.replace('\u2717', '[cross]')  # Replace crosses
             cleaned = cleaned.replace('\u251c', '[tree]')   # Replace tree characters
@@ -188,7 +165,6 @@ class Worker:
         
         try:
             while time.time() < end_time:
-                # Check for timeout
                 if time.time() >= timeout_time:
                     duration = time.time() - start_time
                     error = f"Job timeout after {timeout}s (sleep interrupted)"
@@ -196,10 +172,8 @@ class Worker:
                     self.logger.log_execution(job_id, duration, False, error)
                     return
                 
-                # Small sleep to avoid busy waiting
                 time.sleep(0.1)
                 
-                # Check if worker should stop
                 if self.should_stop:
                     duration = time.time() - start_time
                     error = "Job interrupted by worker shutdown"
@@ -240,7 +214,6 @@ class WorkerManager:
         """Start N workers."""
         started = 0
         
-        # Clean up stale locks before starting new workers
         stale_count = self.queue_manager.storage.cleanup_stale_locks()
         if stale_count > 0:
             self.logger.info(f"Cleaned up {stale_count} stale locks")
@@ -270,9 +243,8 @@ class WorkerManager:
             for worker in self.workers.values():
                 worker.stop()
         
-        # 2. Wait for all threads to finish (graceful shutdown)
         end_time = time.time() + timeout
-        for worker_id, thread in list(self.threads.items()):  # Create a copy to avoid modification during iteration
+        for worker_id, thread in list(self.threads.items()):  
             remaining = max(0, end_time - time.time())
             thread.join(timeout=remaining)
             
@@ -281,7 +253,6 @@ class WorkerManager:
         
         self.logger.info("All workers stopped")
         
-        # 3. Clean up the lists
         with self.lock:
             self.workers.clear()
             self.threads.clear()
@@ -301,4 +272,5 @@ class WorkerManager:
                     'current_job': worker.current_job['id'] if worker.current_job else None
                 }
         
+
         return status
