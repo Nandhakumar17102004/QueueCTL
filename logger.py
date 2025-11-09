@@ -1,39 +1,29 @@
-"""
-Logging utility for QueueCTL.
-"""
-
 import logging
 import os
 from pathlib import Path
 from datetime import datetime
 
 class QueueLogger:
-    """Custom logger for queue system."""
     
     def __init__(self, log_path: str = "logs/queuectl.log"):
         self.log_path = log_path
         Path(log_path).parent.mkdir(parents=True, exist_ok=True)
         
-        # Configure logging
         self.logger = logging.getLogger('queuectl')
         self.logger.setLevel(logging.INFO)
         
-        # File handler
         file_handler = logging.FileHandler(log_path)
         file_handler.setLevel(logging.INFO)
         
-        # Console handler
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.WARNING)
         
-        # Formatter
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
         
-        # Add handlers
         self.logger.addHandler(file_handler)
         self.logger.addHandler(console_handler)
     
@@ -57,14 +47,13 @@ class QueueLogger:
         """Log job execution result with proper encoding handling."""
         status = "success" if success else "failure"
         
-        # Clean output to handle encoding issues
         if output:
             try:
-                # Try to encode as ASCII, replace problematic characters
                 clean_output = output.encode('ascii', 'replace').decode('ascii')
             except:
                 clean_output = "[Output contains non-ASCII characters]"
         else:
             clean_output = ""
         
+
         self.info(f"job={job_id} execution={status} duration={duration:.2f}s output={clean_output[:100]}")
