@@ -1,8 +1,3 @@
-"""
-CLI interface for QueueCTL job queue system.
-Handles all user commands: enqueue, worker, status, dlq, config, etc.
-"""
-
 import sys
 import click
 import json
@@ -17,14 +12,12 @@ from core.worker_manager import WorkerManager
 from utils.logger import QueueLogger
 
 
-# Global instances
 config = ConfigManager()
 storage = Storage(config.get('db_path'))
 logger = QueueLogger(config.get('log_path'))
 queue_manager = QueueManager(storage, config, logger)
 worker_manager = WorkerManager(queue_manager, logger, config)
 
-# Handle graceful shutdown
 def signal_handler(sig, frame):
     click.echo("\nShutting down...")
     worker_manager.stop_all_workers()
@@ -94,16 +87,13 @@ def start(count):
         worker_manager.start_workers(count)
         click.echo(f"Started {count} workers. Press Ctrl+C to stop.")
         
-        # Clean up stale locks on startup
         stale_count = storage.cleanup_stale_locks()
         if stale_count > 0:
             click.echo(f"Cleaned up {stale_count} stale job locks")
         
-        # Keep running until interrupted
         try:
-            # signal.pause is not available on Windows; sleep in a loop instead
             while True:
-                time.sleep(1)  # Use sleep instead of signal.pause on Windows
+                time.sleep(1) 
         except KeyboardInterrupt:
             click.echo("\nShutting down workers...")
             worker_manager.stop_all_workers()
@@ -268,7 +258,6 @@ def show():
 def set(key, value):
     """Set configuration value"""
     try:
-        # Try to parse as number
         try:
             value = int(value)
         except ValueError:
@@ -328,4 +317,5 @@ def _display_jobs(jobs: list, title: str):
 
 
 if __name__ == '__main__':
+
     cli()
