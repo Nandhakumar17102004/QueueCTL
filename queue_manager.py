@@ -1,8 +1,3 @@
-"""
-Main queue management logic.
-Handles job lifecycle: pending -> processing -> completed/failed/dead
-"""
-
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
@@ -12,7 +7,6 @@ from .config_manager import ConfigManager
 from utils.logger import QueueLogger
 
 class QueueManager:
-    """Manages the job queue and lifecycle."""
     
     def __init__(self, storage: Storage, config: ConfigManager, logger: QueueLogger):
         self.storage = storage
@@ -21,8 +15,7 @@ class QueueManager:
     
     def enqueue(self, command: str, priority: int = 0, run_at: Optional[float] = None,
                 max_retries: Optional[int] = None, timeout: Optional[int] = None) -> str:
-        """Enqueue a new job with validation."""
-        # Input validation
+        
         if not command or not command.strip():
             raise ValueError("Command cannot be empty")
         
@@ -35,7 +28,6 @@ class QueueManager:
         job_id = str(uuid.uuid4())[:8]
         now = datetime.now().timestamp()
         
-        # Round the run_at timestamp for consistent SQL comparison
         if run_at is not None:
             run_at = round(run_at, 3)  
             
@@ -102,14 +94,11 @@ class QueueManager:
         attempts = job['attempts'] + 1
         max_retries = job['max_retries']
         
-        # FIXED: Correct retry logic - attempts includes current failure
         if should_retry and attempts <= max_retries:
-            # Calculate exponential backoff: base ^ (attempts) seconds
             base = self.config.get('retry_backoff_base', 2)
-            delay = base ** attempts  # attempts starts from 1 for first retry
+            delay = base ** attempts  
             run_at = datetime.now().timestamp() + delay
             
-            # Keep job in 'pending' state with future run_at for retry
             updates = {
                 'state': 'pending',
                 'attempts': attempts,
@@ -123,7 +112,6 @@ class QueueManager:
                 f"attempt={attempts}/{max_retries}, retry_in={delay}s, error={error[:50]}"
             )
         else:
-            # Move to dead letter queue
             updates = {
                 'state': 'dead',
                 'attempts': attempts,
@@ -176,4 +164,5 @@ class QueueManager:
             'failed': failed,
             'dead': dead,
             'total': pending + processing + completed + failed + dead
+
         }
