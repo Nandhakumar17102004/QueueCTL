@@ -1,0 +1,19 @@
+# QueueCTL - Background Job Queue System
+# Python 3.8+ required
+
+# CLI Framework
+click==8.1.7
+
+# Table formatting for CLI output
+tabulate==0.9.0
+
+# Note: Standard library modules used (no additional requirements):
+# - sqlite3 (built-in)
+# - threading (built-in)
+# - subprocess (built-in)
+# - json (built-in)
+# - logging (built-in)
+# - pathlib (built-in)
+# - datetime (built-in)
+# - uuid (built-in)
+# - signal (built-in)
