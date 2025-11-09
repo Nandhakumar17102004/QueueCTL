@@ -1,17 +1,10 @@
-"""
-Configuration management for QueueCTL.
-Loads/saves settings from JSON with validation.
-"""
-
 import json
 import os
 from pathlib import Path
 from typing import Any, Dict
 
 
-class ConfigManager:
-    """Manages application configuration."""
-    
+class ConfigManager:    
     DEFAULT_CONFIG = {
         "max_retries": 3,
         "retry_backoff_base": 2,
@@ -23,7 +16,6 @@ class ConfigManager:
         "config_path": "config/queuectl.json"
     }
     
-    # Configuration validation rules
     VALIDATORS = {
         "max_retries": lambda x: isinstance(x, int) and x >= 0,
         "retry_backoff_base": lambda x: isinstance(x, (int, float)) and x >= 1,
@@ -46,9 +38,7 @@ class ConfigManager:
             try:
                 with open(self.config_path, 'r') as f:
                     config = json.load(f)
-                    # Merge with defaults for any missing keys
                     merged_config = {**self.DEFAULT_CONFIG, **config}
-                    # Validate loaded config
                     self._validate_config(merged_config)
                     return merged_config
             except Exception as e:
@@ -80,7 +70,6 @@ class ConfigManager:
     
     def set(self, key: str, value: Any) -> bool:
         """Set config value and persist."""
-        # Validate before setting
         if key in self.VALIDATORS and not self.VALIDATORS[key](value):
             raise ValueError(f"Invalid value for {key}: {value}")
         
@@ -89,7 +78,6 @@ class ConfigManager:
     
     def update_multiple(self, updates: Dict[str, Any]) -> bool:
         """Update multiple config values."""
-        # Validate all updates first
         for key, value in updates.items():
             if key in self.VALIDATORS and not self.VALIDATORS[key](value):
                 raise ValueError(f"Invalid value for {key}: {value}")
@@ -99,4 +87,5 @@ class ConfigManager:
     
     def get_all(self) -> Dict[str, Any]:
         """Get all configuration."""
+
         return self.config.copy()
