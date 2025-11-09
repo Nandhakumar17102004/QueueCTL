@@ -1,8 +1,3 @@
-"""
-SQLite-based persistent storage for job queue system.
-Handles all database operations with thread-safe locking.
-"""
-
 import sqlite3
 import json
 import os
@@ -14,7 +9,6 @@ import time
 
 
 class Storage:
-    """Thread-safe SQLite storage for job persistence."""
     
     def __init__(self, db_path: str = "data/queuectl.db"):
         self.db_path = db_path
@@ -23,7 +17,6 @@ class Storage:
         self._init_db()
     
     def _get_connection(self):
-        """Get database connection with timeout and ensure it's properly closed."""
         conn = sqlite3.connect(self.db_path, timeout=10.0)
         conn.row_factory = sqlite3.Row
         return conn
@@ -35,7 +28,6 @@ class Storage:
             try:
                 cursor = conn.cursor()
                 
-                # Jobs table
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS jobs (
                         id TEXT PRIMARY KEY,
@@ -57,7 +49,6 @@ class Storage:
                     )
                 """)
                 
-                # Metrics table
                 cursor.execute("""
                     CREATE TABLE IF NOT EXISTS metrics (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +58,6 @@ class Storage:
                     )
                 """)
                 
-                # Create indexes for performance
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_state ON jobs(state)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_priority ON jobs(priority DESC)")
                 cursor.execute("CREATE INDEX IF NOT EXISTS idx_run_at ON jobs(run_at)")
@@ -80,7 +70,6 @@ class Storage:
                 conn.close()
     
     def enqueue_job(self, job: Dict[str, Any]) -> bool:
-        """Add job to database."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -112,7 +101,6 @@ class Storage:
                 conn.close()
     
     def get_job(self, job_id: str) -> Optional[Dict]:
-        """Retrieve job by ID."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -124,10 +112,6 @@ class Storage:
                 conn.close()
     
     def get_and_lock_next_job(self, worker_id: str, lock_duration: int = 60) -> Optional[Dict]:
-        """
-        Atomically finds and locks the next pending job in a single operation.
-        FIXED: No race condition between SELECT and UPDATE.
-        """
         with self.lock:
             conn = self._get_connection()
             try:
@@ -135,7 +119,6 @@ class Storage:
                 now = datetime.now().timestamp()
                 expires = now + lock_duration
                 
-                # Single atomic operation to find AND lock the next job
                 cursor.execute("""
                     UPDATE jobs 
                     SET worker_id = ?, lock_token = ?, lock_expires = ?, 
@@ -165,7 +148,6 @@ class Storage:
                 conn.close()
     
     def cleanup_stale_locks(self, timeout_seconds: int = 300) -> int:
-        """Release locks from crashed workers. Returns number of jobs unlocked."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -190,7 +172,6 @@ class Storage:
                 conn.close()
     
     def update_job(self, job_id: str, updates: Dict[str, Any]) -> bool:
-        """Update job state and attributes."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -212,7 +193,6 @@ class Storage:
                 conn.close()
     
     def get_pending_jobs(self, limit: int = 10) -> List[Dict]:
-        """Get next batch of pending jobs ordered by priority and run_at."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -233,7 +213,6 @@ class Storage:
                 conn.close()
     
     def get_failed_jobs(self, limit: int = 100) -> List[Dict]:
-        """Get failed jobs (DLQ)."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -248,7 +227,6 @@ class Storage:
                 conn.close()
     
     def get_jobs_by_state(self, state: str, limit: int = 100) -> List[Dict]:
-        """Get jobs by state."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -263,7 +241,6 @@ class Storage:
                 conn.close()
     
     def record_metric(self, metric_type: str, value: float) -> bool:
-        """Record a metric for monitoring."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -280,7 +257,6 @@ class Storage:
                 conn.close()
     
     def get_metrics(self, metric_type: str, seconds: int = 3600) -> List[Dict]:
-        """Get metrics from last N seconds."""
         with self.lock:
             conn = self._get_connection()
             try:
@@ -296,4 +272,5 @@ class Storage:
                 metrics = [dict(row) for row in cursor.fetchall()]
                 return metrics
             finally:
+
                 conn.close()
