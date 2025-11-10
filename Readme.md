@@ -1,6 +1,6 @@
 # QueueCTL 🚀
 
-A production-grade, CLI-based background job queue system built with Python. QueueCTL manages background jobs with worker processes, handles retries using exponential backoff, and maintains a Dead Letter Queue (DLQ) for permanently failed jobs.
+A CLI-based background job queue system built with Python. QueueCTL manages background jobs with worker processes, handles retries using exponential backoff, and maintains a Dead Letter Queue (DLQ) for permanently failed jobs.
 
 > **Built for**: Backend Developer Internship Assignment  
 > **Tech Stack**: Python 3.8+, SQLite, Click, Threading
@@ -142,13 +142,6 @@ python cli.py enqueue --job "flaky_api.py" --max-retries 5
 
 # 30 second timeout per attempt
 python cli.py enqueue --job "long_task.py" --timeout 30
-
-# Combine settings
-python cli.py enqueue --job "important.py" \
-  --priority 10 \
-  --max-retries 3 \
-  --timeout 60
-```
 
 # Worker Management
 
@@ -650,49 +643,9 @@ queuectl/
 - [ ] **Async I/O**: Use asyncio for better concurrency
 
 ---
-
-## 📚 Additional Resources
-
-### Documentation
-- [SQLite Documentation](https://www.sqlite.org/docs.html)
-- [Click Framework](https://click.palletsprojects.com/)
-- [Python Threading Guide](https://docs.python.org/3/library/threading.html)
-
-### Similar Projects (Inspiration)
-- [Celery](https://docs.celeryq.dev/) - Distributed task queue for Python
-- [RQ](https://python-rq.org/) - Simple Python job queue backed by Redis
-- [APScheduler](https://apscheduler.readthedocs.io/) - Advanced Python scheduler
-
----
-
-## 🤝 Contributing
-
-This is a demonstration project for an internship assignment. However, feedback and suggestions are welcome!
-
----
-
-## 📄 License
-
-This project is created for educational purposes as part of a backend developer internship assignment.
-
----
-
-## 👨‍💻 Author
-
-**Assignment**: Backend Developer Internship  
-**Project**: QueueCTL - Job Queue System  
-**Date**: November 2025
-
----
-
-## 🙏 Acknowledgments
-
-- Built following industry best practices from Celery and RQ
-- Exponential backoff pattern inspired by AWS SQS
-- Testing approach modeled after production queue systems
-
 ---
 
 **Happy Queueing! 🚀**
+
 
 For questions or issues, please review the test output and logs in `logs/queuectl.log`.
