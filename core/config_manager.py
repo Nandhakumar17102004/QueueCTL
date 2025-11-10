@@ -1,10 +1,7 @@
-
-
 import json
 import os
 from pathlib import Path
 from typing import Any, Dict
-
 
 class ConfigManager:
     
@@ -19,7 +16,6 @@ class ConfigManager:
         "config_path": "config/queuectl.json"
     }
     
-    # Configuration validation rules
     VALIDATORS = {
         "max_retries": lambda x: isinstance(x, int) and x >= 0,
         "retry_backoff_base": lambda x: isinstance(x, (int, float)) and x >= 1,
@@ -37,14 +33,11 @@ class ConfigManager:
         self.config = self._load_config()
     
     def _load_config(self) -> Dict[str, Any]:
-        """Load config from file or create default."""
         if os.path.exists(self.config_path):
             try:
                 with open(self.config_path, 'r') as f:
                     config = json.load(f)
-                    # Merge with defaults for any missing keys
                     merged_config = {**self.DEFAULT_CONFIG, **config}
-                    # Validate loaded config
                     self._validate_config(merged_config)
                     return merged_config
             except Exception as e:
@@ -55,7 +48,6 @@ class ConfigManager:
             return self.DEFAULT_CONFIG.copy()
     
     def _save_config(self, config: Dict[str, Any]) -> bool:
-        """Save config to file."""
         try:
             with open(self.config_path, 'w') as f:
                 json.dump(config, f, indent=2)
@@ -65,17 +57,14 @@ class ConfigManager:
             return False
     
     def _validate_config(self, config: Dict[str, Any]):
-        """Validate configuration values."""
         for key, value in config.items():
             if key in self.VALIDATORS and not self.VALIDATORS[key](value):
                 raise ValueError(f"Invalid config value for {key}: {value}")
     
     def get(self, key: str, default: Any = None) -> Any:
-        """Get config value."""
         return self.config.get(key, default)
     
     def set(self, key: str, value: Any) -> bool:
-        """Set config value and persist."""
         if key in self.VALIDATORS and not self.VALIDATORS[key](value):
             raise ValueError(f"Invalid value for {key}: {value}")
         
@@ -83,8 +72,6 @@ class ConfigManager:
         return self._save_config(self.config)
     
     def update_multiple(self, updates: Dict[str, Any]) -> bool:
-        """Update multiple config values."""
-        # Validate all updates first
         for key, value in updates.items():
             if key in self.VALIDATORS and not self.VALIDATORS[key](value):
                 raise ValueError(f"Invalid value for {key}: {value}")
@@ -94,4 +81,5 @@ class ConfigManager:
     
     def get_all(self) -> Dict[str, Any]:
         """Get all configuration."""
+
         return self.config.copy()
