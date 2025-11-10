@@ -2,8 +2,7 @@
 
 A CLI-based background job queue system built with Python. QueueCTL manages background jobs with worker processes, handles retries using exponential backoff, and maintains a Dead Letter Queue (DLQ) for permanently failed jobs.
 
-> **Built for**: Backend Developer Internship Assignment  
-> **Tech Stack**: Python 3.8+, SQLite, Click, Threading
+**Tech Stack**: Python 3.8+, SQLite, Click, Threading
 
 ---
 
@@ -11,7 +10,6 @@ A CLI-based background job queue system built with Python. QueueCTL manages back
 
 - [Features]
 - [QuickStart]
-- [Installation]
 - [Usage Examples]
 - [Architecture]
 - [CLI Commands]
@@ -66,36 +64,6 @@ python cli.py worker start --count 1
 # Check the status
 python cli.py status
 ```
-
-That's it! Your first job is now running. 🎉
-
----
-
-## 📦 Installation
-
-### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
-
-### Step 1: Clone or Download
-
-# If you have the project files, navigate to the directory
-cd queuectl
-```
-
-### Step 2: Install Dependencies
-
-pip install click tabulate
-```
-
-### Step 3: Verify Installation
-
-python cli.py --help
-```
-
-You should see the QueueCTL help menu with all available commands.
-
----
 
 ## 💡 Usage Examples
 
@@ -649,3 +617,4 @@ queuectl/
 
 
 For questions or issues, please review the test output and logs in `logs/queuectl.log`.
+
