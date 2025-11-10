@@ -1,8 +1,3 @@
-"""
-Main queue management logic.
-Handles job lifecycle: pending -> processing -> completed/failed/dead
-"""
-
 import uuid
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional
@@ -11,9 +6,7 @@ from .storage import Storage
 from .config_manager import ConfigManager
 from utils.logger import QueueLogger
 
-class QueueManager:
-    """Manages the job queue and lifecycle."""
-    
+class QueueManager:    
     def __init__(self, storage: Storage, config: ConfigManager, logger: QueueLogger):
         self.storage = storage
         self.config = config
@@ -21,8 +14,6 @@ class QueueManager:
     
     def enqueue(self, command: str, priority: int = 0, run_at: Optional[float] = None,
                 max_retries: Optional[int] = None, timeout: Optional[int] = None) -> str:
-        """Enqueue a new job with validation."""
-        # Input validation
         if not command or not command.strip():
             raise ValueError("Command cannot be empty")
         
@@ -35,7 +26,6 @@ class QueueManager:
         job_id = str(uuid.uuid4())[:8]
         now = datetime.now().timestamp()
         
-        # Round the run_at timestamp for consistent SQL comparison
         if run_at is not None:
             run_at = round(run_at, 3)  
             
@@ -58,7 +48,6 @@ class QueueManager:
             raise Exception("Failed to enqueue job")
     
     def schedule_job(self, command: str, delay_seconds: int, **kwargs) -> str:
-        """Schedule a job to run after delay."""
         if delay_seconds < 0:
             raise ValueError("Delay cannot be negative")
             
@@ -66,10 +55,6 @@ class QueueManager:
         return self.enqueue(command, run_at=run_at, **kwargs)
 
     def get_and_lock_next_job(self, worker_id: str, lock_duration: int = 60) -> Optional[Dict]:
-        """
-        Atomically retrieves a pending job and sets its state to 'processing' (locking it).
-        This method delegates the atomic logic to the Storage layer.
-        """
         job = self.storage.get_and_lock_next_job(worker_id, lock_duration)
         
         if job:
@@ -79,7 +64,6 @@ class QueueManager:
         return None
     
     def mark_job_completed(self, job_id: str, output: str = "") -> bool:
-        """Mark job as completed."""
         updates = {
             'state': 'completed',
             'completed_at': datetime.now().timestamp(),
@@ -94,7 +78,6 @@ class QueueManager:
         return success
     
     def mark_job_failed(self, job_id: str, error: str = "", should_retry: bool = True) -> bool:
-        """Mark job as failed and handle retry logic."""
         job = self.storage.get_job(job_id)
         if not job:
             return False
@@ -102,14 +85,11 @@ class QueueManager:
         attempts = job['attempts'] + 1
         max_retries = job['max_retries']
         
-        # FIXED: Correct retry logic - attempts includes current failure
         if should_retry and attempts <= max_retries:
-            # Calculate exponential backoff: base ^ (attempts) seconds
             base = self.config.get('retry_backoff_base', 2)
-            delay = base ** attempts  # attempts starts from 1 for first retry
+            delay = base ** attempts  
             run_at = datetime.now().timestamp() + delay
             
-            # Keep job in 'pending' state with future run_at for retry
             updates = {
                 'state': 'pending',
                 'attempts': attempts,
@@ -123,7 +103,6 @@ class QueueManager:
                 f"attempt={attempts}/{max_retries}, retry_in={delay}s, error={error[:50]}"
             )
         else:
-            # Move to dead letter queue
             updates = {
                 'state': 'dead',
                 'attempts': attempts,
@@ -143,7 +122,6 @@ class QueueManager:
         return success
     
     def retry_dead_letter_job(self, job_id: str) -> bool:
-        """Retry a job from the dead letter queue."""
         job = self.storage.get_job(job_id)
         if not job or job['state'] != 'dead':
             return False
@@ -162,7 +140,6 @@ class QueueManager:
         return success
     
     def get_metrics_summary(self) -> Dict[str, Any]:
-        """Get system metrics summary."""
         pending = len(self.storage.get_jobs_by_state('pending', limit=1000))
         processing = len(self.storage.get_jobs_by_state('processing', limit=1000))
         completed = len(self.storage.get_jobs_by_state('completed', limit=1000))
@@ -176,4 +153,5 @@ class QueueManager:
             'failed': failed,
             'dead': dead,
             'total': pending + processing + completed + failed + dead
+
         }
