@@ -1,0 +1,10 @@
+{
+  "max_retries": 3,
+  "retry_backoff_base": 2,
+  "job_timeout": 300,
+  "worker_poll_interval": 1,
+  "max_concurrent_jobs": 4,
+  "db_path": "data/queuectl.db",
+  "log_path": "logs/queuectl.log",
+  "config_path": "config/queuectl.json"
+}
