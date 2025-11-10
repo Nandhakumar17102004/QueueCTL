@@ -1,0 +1,79 @@
+2025-11-09 21:49:26,689 - queuectl - INFO - job=00d981aa state=pending command=dir C:\Users\Lenovo\Downloads\queuectl
+2025-11-09 21:49:48,702 - queuectl - INFO - job=0a0b9896 state=pending command=dir
+2025-11-09 22:09:16,295 - queuectl - INFO - job=ded76c70 state=pending command=dir
+2025-11-09 22:12:32,949 - queuectl - INFO - job=1282df68 state=pending command=dir
+2025-11-09 22:14:50,338 - queuectl - INFO - job=3ab0f70b state=pending command=echo 'Hello QueueCTL'
+2025-11-09 22:15:11,235 - queuectl - INFO - job=916ff457 state=pending command=python -c "import time; time.sleep(5); print('Long
+2025-11-09 22:15:20,234 - queuectl - INFO - job=6e02b465 state=pending command=echo 'URGENT: High priority task'
+2025-11-09 22:15:30,475 - queuectl - INFO - job=5af29fc7 state=pending command=echo 'This runs after 10 seconds'
+2025-11-09 22:16:00,880 - queuectl - INFO - Worker worker-1762706760880-0 started
+2025-11-09 22:16:00,880 - queuectl - INFO - Worker worker-1762706760880-1 started
+2025-11-09 22:16:00,880 - queuectl - INFO - Worker worker-1762706760880-2 started
+2025-11-09 22:16:00,880 - queuectl - INFO - Started 3 workers, total=3
+2025-11-09 22:16:00,891 - queuectl - INFO - job=6e02b465 state=processing worker=worker-1762706760880-0
+2025-11-09 22:16:00,902 - queuectl - INFO - job=00d981aa state=processing worker=worker-1762706760880-1
+2025-11-09 22:16:00,916 - queuectl - INFO - job=0a0b9896 state=processing worker=worker-1762706760880-2
+2025-11-09 22:16:00,951 - queuectl - INFO - job=00d981aa state=completed output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:00,956 - queuectl - INFO - job=0a0b9896 state=completed output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:00,968 - queuectl - INFO - job=00d981aa execution=success duration=0.04s output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:00,975 - queuectl - INFO - job=6e02b465 state=completed output='URGENT: High priority task'
+
+2025-11-09 22:16:00,982 - queuectl - INFO - job=0a0b9896 execution=success duration=0.03s output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:00,996 - queuectl - INFO - job=6e02b465 execution=success duration=0.06s output='URGENT: High priority task'
+
+2025-11-09 22:16:01,011 - queuectl - INFO - job=ded76c70 state=processing worker=worker-1762706760880-1
+2025-11-09 22:16:01,018 - queuectl - INFO - job=1282df68 state=processing worker=worker-1762706760880-2
+2025-11-09 22:16:01,033 - queuectl - INFO - job=3ab0f70b state=processing worker=worker-1762706760880-0
+2025-11-09 22:16:01,042 - queuectl - INFO - job=ded76c70 state=completed output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:01,047 - queuectl - INFO - job=1282df68 state=completed output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:01,054 - queuectl - INFO - job=ded76c70 execution=success duration=0.02s output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:01,064 - queuectl - INFO - job=1282df68 execution=success duration=0.02s output= Volume in drive C is Windows-SSD
+ Volume Serial Number is CAEF-EE6D
+
+ Directory of C:\Users\Lenovo\
+2025-11-09 22:16:01,078 - queuectl - INFO - job=3ab0f70b state=completed output='Hello QueueCTL'
+
+2025-11-09 22:16:01,092 - queuectl - INFO - job=916ff457 state=processing worker=worker-1762706760880-1
+2025-11-09 22:16:01,099 - queuectl - INFO - job=3ab0f70b execution=success duration=0.02s output='Hello QueueCTL'
+
+2025-11-09 22:16:01,106 - queuectl - INFO - job=5af29fc7 state=processing worker=worker-1762706760880-2
+2025-11-09 22:16:01,137 - queuectl - INFO - job=5af29fc7 state=completed output='This runs after 10 seconds'
+
+2025-11-09 22:16:01,146 - queuectl - INFO - job=5af29fc7 execution=success duration=0.03s output='This runs after 10 seconds'
+
+2025-11-09 22:16:04,119 - queuectl - WARNING - Job 916ff457 timeout after 3s, terminating...
+2025-11-09 22:16:04,123 - queuectl - INFO - job=916ff457 state=failed attempt=1/2, retry_in=2s, error=Job timeout after 3s
+2025-11-09 22:16:04,146 - queuectl - INFO - job=916ff457 execution=failure duration=3.03s output=Job timeout after 3s
+2025-11-09 22:16:06,137 - queuectl - INFO - job=916ff457 state=processing worker=worker-1762706760880-0
+2025-11-09 22:16:09,157 - queuectl - WARNING - Job 916ff457 timeout after 3s, terminating...
+2025-11-09 22:16:09,161 - queuectl - INFO - job=916ff457 state=failed attempt=2/2, retry_in=4s, error=Job timeout after 3s
+2025-11-09 22:16:09,177 - queuectl - INFO - job=916ff457 execution=failure duration=3.02s output=Job timeout after 3s
+2025-11-09 22:16:13,180 - queuectl - INFO - job=916ff457 state=processing worker=worker-1762706760880-1
+2025-11-09 22:16:16,204 - queuectl - WARNING - Job 916ff457 timeout after 3s, terminating...
+2025-11-09 22:16:16,208 - queuectl - INFO - job=916ff457 state=dead max_retries_exhausted, final_error=Job timeout after 3s
+2025-11-09 22:16:16,235 - queuectl - INFO - job=916ff457 execution=failure duration=3.02s output=Job timeout after 3s
+2025-11-09 22:26:30,190 - queuectl - INFO - job=ed082879 state=pending command=echo 'NEW: Dynamic job 1'
+2025-11-09 22:26:39,335 - queuectl - INFO - job=cfbb78db state=pending command=exit 5
+2025-11-09 22:28:23,564 - queuectl - INFO - job=dcf9eaf0 state=pending command=invalid_command
+2025-11-09 22:30:04,524 - queuectl - INFO - job=916ff457 state=pending retried from DLQ

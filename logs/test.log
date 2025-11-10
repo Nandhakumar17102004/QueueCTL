@@ -1,0 +1,10 @@
+2025-11-07 17:41:13 - queuectl - INFO - JOB_EVENT: c8a855bd -> pending command=echo "hello world"
+2025-11-07 17:41:13 - queuectl - INFO - Worker worker-0-0 started
+2025-11-07 17:41:13 - queuectl - INFO - Started 1 workers, total=1
+2025-11-07 17:41:13 - queuectl - INFO - JOB_EVENT: c8a855bd -> processing worker=worker-0-0
+2025-11-07 17:41:13 - queuectl - INFO - JOB_EVENT: c8a855bd -> completed output="hello world"
+
+2025-11-07 17:41:13 - queuectl - INFO - EXECUTION: c8a855bd SUCCESS (0.04s) "hello world"
+
+2025-11-07 17:41:13 - queuectl - INFO - JOB_EVENT: c8a855bd -> dead max_retries_exhausted, final_error='ConfigManager' object has no attribute 'storage'
+2025-11-07 17:41:13 - queuectl - ERROR - Error executing job c8a855bd: 'ConfigManager' object has no attribute 'storage'
